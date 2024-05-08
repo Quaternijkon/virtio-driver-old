@@ -36,7 +36,7 @@ impl<H: Hal> VirtIOBlk<'_, H> {
             let features = BlkFeature::from_bits_truncate(features);
             info!("device features: {:?}", features);
             // negotiate these flags only
-            let supported_features = SUPPORTED_FEATURES;
+            let supported_features = BlkFeature::empty();
             (features & supported_features).bits()
         }));
         // header.begin_init(|features| {
