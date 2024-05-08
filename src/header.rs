@@ -169,15 +169,17 @@ impl VirtIOHeader {
     /// Begin initializing the device.
     ///
     /// Ref: virtio 3.1.1 Device Initialization
-    pub fn begin_init(&mut self, negotiate_features: impl FnOnce(u64) -> u64) {
+    pub fn begin_init(&mut self, negotiate_features: impl FnOnce(u64) -> u64) -> u64 {
         self.status.write(DeviceStatus::ACKNOWLEDGE);
         self.status.write(DeviceStatus::DRIVER);
 
         let features = self.read_device_features();
-        self.write_driver_features(negotiate_features(features));
+        let negotiated_features = negotiate_features(features);
+        self.write_driver_features(negotiated_features);
         self.status.write(DeviceStatus::FEATURES_OK);
 
         self.guest_page_size.write(PAGE_SIZE as u32);
+        negotiated_features
     }
 
     /// Finish initializing the device.
