@@ -147,7 +147,53 @@ pub struct VirtIOHeader {
     config_generation: ReadOnly<u32>,
 }
 
+impl Default for VirtIOHeader {
+    fn default() -> Self {
+        Self {
+            magic: ReadOnly::new(0),
+            version: ReadOnly::new(0),
+            device_id: ReadOnly::new(0),
+            vendor_id: ReadOnly::new(0),
+            device_features: ReadOnly::new(0),
+            device_features_sel: WriteOnly::default(),
+            __r1: Default::default(),
+            driver_features: WriteOnly::default(),
+            driver_features_sel: WriteOnly::default(),
+            guest_page_size: WriteOnly::default(),
+            __r2: Default::default(),
+            queue_sel: WriteOnly::default(),
+            queue_num_max: ReadOnly::new(0),
+            queue_num: WriteOnly::default(),
+            queue_align: WriteOnly::default(),
+            queue_pfn: Volatile::new(0),
+            queue_ready: Volatile::new(0),
+            __r3: Default::default(),
+            queue_notify: WriteOnly::default(),
+            __r4: Default::default(),
+            interrupt_status: ReadOnly::new(0),
+            interrupt_ack: WriteOnly::default(),
+            __r5: Default::default(),
+            status: Volatile::new(DeviceStatus::empty()),
+            __r6: Default::default(),
+            queue_desc_low: WriteOnly::default(),
+            queue_desc_high: WriteOnly::default(),
+            __r7: Default::default(),
+            queue_avail_low: WriteOnly::default(),
+            queue_avail_high: WriteOnly::default(),
+            __r8: Default::default(),
+            queue_used_low: WriteOnly::default(),
+            queue_used_high: WriteOnly::default(),
+            __r9: Default::default(),
+            config_generation: ReadOnly::new(0),
+        }
+    }
+}
+
 impl VirtIOHeader {
+    pub fn new(base: usize) -> &'static mut Self {
+        unsafe { &mut *(base as *mut Self) }
+    }
+
     /// Verify a valid header.
     pub fn verify(&self) -> bool {
         self.magic.read() == MAGIC_VALUE && self.version.read() == 1 && self.device_id.read() != 0

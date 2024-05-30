@@ -1,7 +1,11 @@
 [package]
 name = "virtio-drivers"
 version = "0.1.0"
-authors = ["Jiajie Chen <noc@jiegec.ac.cn>", "Runji Wang <wangrunji0408@163.com>", "Yuekai Jia <equation618@gmail.com>"]
+authors = [
+    "Jiajie Chen <noc@jiegec.ac.cn>",
+    "Runji Wang <wangrunji0408@163.com>",
+    "Yuekai Jia <equation618@gmail.com>",
+]
 edition = "2018"
 description = "VirtIO guest drivers."
 
@@ -11,3 +15,11 @@ description = "VirtIO guest drivers."
 volatile = "0.3"
 log = "0.4"
 bitflags = "1.3"
+zerocopy = { version = "0.7.5", features = ["derive"] }
+
+[features]
+default = ["alloc"]
+alloc = ["zerocopy/alloc"]
+
+[dev-dependencies]
+zerocopy = { version = "0.7.5", features = ["alloc"] }

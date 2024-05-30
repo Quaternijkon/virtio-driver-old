@@ -8,6 +8,9 @@ use bitflags::*;
 
 use volatile::Volatile;
 
+use core::ptr;
+use core::ptr::NonNull;
+
 /// The mechanism for bulk data transport on virtio devices.
 ///
 /// Each device can have zero or more virtqueues.
@@ -173,6 +176,49 @@ impl<H: Hal> VirtQueue<'_, H> {
 
         Ok((index, len))
     }
+
+    // pub unsafe fn pop_used_token<'a>(
+    //     &mut self,
+    //     token: u16,
+    //     inputs: &'a [&'a [u8]],
+    //     outputs: &'a mut [&'a mut [u8]],
+    // ) -> Result<u32> {
+    //     if !self.can_pop() {
+    //         return Err(Error::NotReady);
+    //     }
+
+    //     // Get the index of the start of the descriptor chain for the next element in the used ring.
+    //     let last_used_slot = self.last_used_idx & (self.queue_size as u16 - 1);
+    //     let index;
+    //     let len;
+    //     // Safe because self.used points to a valid, aligned, initialised, dereferenceable, readable
+    //     // instance of UsedRing.
+    //     unsafe {
+    //         index = (*self.used.as_ptr()).ring[last_used_slot as usize].id as u16;
+    //         len = (*self.used.as_ptr()).ring[last_used_slot as usize].len;
+    //     }
+
+    //     if index != token {
+    //         // The device used a different descriptor chain to the one we were expecting.
+    //         return Err(Error::WrongToken);
+    //     }
+
+    //     // Safe because the caller ensures the buffers are valid and match the descriptor.
+    //     unsafe {
+    //         self.recycle_descriptors(index, inputs, outputs);
+    //     }
+    //     self.last_used_idx = self.last_used_idx.wrapping_add(1);
+
+    //     if self.event_idx {
+    //         unsafe {
+    //             (*self.avail.as_ptr())
+    //                 .used_event
+    //                 .store(self.last_used_idx, Ordering::Release);
+    //         }
+    //     }
+
+    //     Ok(len)
+    // }
 
     /// Return size of the queue.
     pub fn size(&self) -> u16 {
